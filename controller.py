@@ -1,11 +1,13 @@
 from model import Model
-import bcrypt
 class Controller:
     def __init__(self):
         self.model = Model()
     
-    def setUser(self, user, password:str):
-        salt = bcrypt.gensalt()
-        return self.model.setUser(user, bcrypt.hashpw(password.encode('utf-8'), salt))
+    def setUser(self, user, password:str, password2:str):
+        return self.model.setUser(user, password, password2)
     def auth(self, user, password):
         return self.model.auth(user, password)
+    def setView(self, view):
+        self.view = view
+
+    

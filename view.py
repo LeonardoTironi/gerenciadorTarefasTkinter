@@ -3,21 +3,13 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox, Scrollbar, RIGHT, Y, END
 from controller import Controller
-"""
-A fazer
-Criar conta
-Fazer login
 
-Pronto
-Mostrar processos
-Mostrar dados dos processos
-Atualizar processos por RAM e por nome
-Atualizar automaticamente
-"""
+
 class LoginScreen:
     def __init__(self, root):
 
         self.controller = Controller()
+        self.controller.setView(self)
         self.root = root
         self.root.title("Tela de Login")
         self.root.geometry("300x250")
@@ -36,27 +28,24 @@ class LoginScreen:
         self.btn_login.pack(pady=10)
         self.btn_register = tk.Button(root, text="Criar conta", command=lambda: open_register(self.root))
         self.btn_register.pack(pady=10)
+        
     def check_login(self):
         user = self.entry_username.get()
         password = self.entry_password.get()
-        if user:
-            if password:
-                resultado = self.controller.auth(user, password)
-                if resultado:
-                    messagebox.showinfo("Login bem-sucedido", "Bem-vindo ao Gerenciador de Tarefas!")
-                    self.root.destroy()
-                    open_task_manager()
-
-                else:
-                    messagebox.showerror("Erro de login", "Usuário ou senha errados.")
-            else:
-                messagebox.showerror("Erro de Login", "Escreva a senha")
+        resultado = self.controller.auth(user, password)
+        if resultado[0]==0:
+            messagebox.showinfo("Login bem-sucedido", resultado[1])
+            self.root.destroy()
+            open_task_manager()
         else:
-            messagebox.showerror("Erro de Login", "Escreva o nome de usuário")
+            messagebox.showinfo("Erro de Login", f"Erro: {resultado[0]}, {resultado[1]}")
+            
+
 class RegisterScreen:
     def __init__(self, root):
 
         self.controller = Controller()
+        self.controller.setView(self)
         self.root = root
         self.root.title("Tela de Registro")
         self.root.geometry("300x300")
@@ -78,28 +67,17 @@ class RegisterScreen:
         self.btn_register.pack(pady=10)
         self.btn_login = tk.Button(root, text="Login", command=lambda: open_login(self.root))
         self.btn_login.pack(pady=10)
+    
     def check_register(self):
         user = self.entry_username.get()
         password = self.entry_password.get()
         password2 = self.entry_password2.get()
-        if user:
-            if password and password2:
-                if password==password2:
-                    resultado = self.controller.setUser(user, password)
-                    if resultado:
-                        messagebox.showinfo("Login bem-sucedido", "Bem-vindo ao Gerenciador de Tarefas!")
-                        open_login(self.root)
-
-                    else:
-                        messagebox.showerror("Erro de Registro", "Usuário já existe.")
-                else:
-                    messagebox.showerror("Erro de Registro", "Senhas diferentes")
-                    self.entry_password.delete(0, END)
-                    self.entry_password2.delete(0, END)
-            else:
-                messagebox.showerror("Erro de Registro", "Escreva as duas senhas")
+        resultado = self.controller.setUser(user,password, password2)
+        if resultado[0]==0:
+            messagebox.showinfo("Login bem-sucedido", "Usuário cadastrado!")
+            open_login(self.root)
         else:
-            messagebox.showerror("Erro de Registro", "Coloque um nome")
+            messagebox.showinfo("Erro de Registro", f"Erro: {resultado[0]}, {resultado[1]}")
 
 class TaskManager:
     def __init__(self, root):
@@ -109,9 +87,12 @@ class TaskManager:
         self.tipo = 0
 
         self.tree = ttk.Treeview(root, columns=("PID", "Nome", "Prioridade", "Uso CPU", "Estado", "Memória"), show="headings")
+        
         scrollbar = Scrollbar(self.tree)
         scrollbar.pack( side = RIGHT, fill=Y )
         scrollbar.config( command = self.tree.yview )
+        self.tree.config(yscrollcommand=scrollbar.set)
+
         self.tree.heading("PID", text="PID")
         self.tree.heading("Nome", text="Nome")
         self.tree.heading("Prioridade", text="Prioridade")
@@ -132,9 +113,9 @@ class TaskManager:
         self.btn_refresh_name.pack()
         self.btn_refresh_memo = tk.Button(root, text="Atualizar por memória", command=lambda: self.refresh_processes(1))
         self.btn_refresh_memo.pack()
-        self.refresh_processes(0)
         self.btn_terminate = tk.Button(root, text="Finalizar Processo", command=self.terminate_process)
         self.btn_terminate.pack()
+        self.refresh_processes(0)
         self.auto_refresh()
 
     def auto_refresh(self):
@@ -207,7 +188,7 @@ def open_register(tela):
     tela.destroy()
     root = tk.Tk()
     reg = RegisterScreen(root)
-    root.mainloop
+    root.mainloop()
 
 if __name__ == "__main__":
     root = tk.Tk()
