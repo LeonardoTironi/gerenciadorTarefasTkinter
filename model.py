@@ -19,6 +19,5 @@ class Model:
     def auth(self, user, password):
         self.cursor.execute("Select password from users where user=?",(user, ))
         passC = self.cursor.fetchall()
-        print(passC[0])
         return bcrypt.checkpw(password.encode('utf-8'), passC[0][0])
 

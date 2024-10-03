@@ -48,7 +48,7 @@ class LoginScreen:
                     open_task_manager()
 
                 else:
-                    messagebox.showerror("Erro de login", "Usuário já existe.")
+                    messagebox.showerror("Erro de login", "Usuário ou senha errados.")
             else:
                 messagebox.showerror("Erro de Login", "Escreva a senha")
         else:
@@ -139,7 +139,7 @@ class TaskManager:
 
     def auto_refresh(self):
         self.refresh_processes(self.tipo)
-        self.root.after(2000, self.auto_refresh)
+        self.root.after(5000, self.auto_refresh)
 
     def terminate_process(self):
         selected_item = self.tree.selection()
@@ -186,11 +186,9 @@ class TaskManager:
         if tipo == 0:
             self.tipo = 0
             processes.sort(key=lambda x: x[1].lower())
-            print("Atualizou por nome")
         elif tipo == 1:
             self.tipo = 1
             processes.sort(key=lambda x: x[5], reverse=True)
-            print("Atualizou por RAM")
 
         for process in processes:
             self.tree.insert("", "end", values=process)
