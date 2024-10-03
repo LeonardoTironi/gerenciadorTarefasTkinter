@@ -20,7 +20,7 @@ class LoginScreen:
         self.controller = Controller()
         self.root = root
         self.root.title("Tela de Login")
-        self.root.geometry("300x200")
+        self.root.geometry("300x250")
 
         self.label_username = tk.Label(root, text="Usuário:")
         self.label_username.pack(pady=5)
@@ -39,15 +39,20 @@ class LoginScreen:
     def check_login(self):
         user = self.entry_username.get()
         password = self.entry_password.get()
+        if user:
+            if password:
+                resultado = self.controller.auth(user, password)
+                if resultado:
+                    messagebox.showinfo("Login bem-sucedido", "Bem-vindo ao Gerenciador de Tarefas!")
+                    self.root.destroy()
+                    open_task_manager()
 
-        resultado = self.controller.auth(user, password)
-        if resultado:
-            messagebox.showinfo("Login bem-sucedido", "Bem-vindo ao Gerenciador de Tarefas!")
-            self.root.destroy()
-            open_task_manager()
-
+                else:
+                    messagebox.showerror("Erro de login", "Usuário já existe.")
+            else:
+                messagebox.showerror("Erro de Login", "Escreva a senha")
         else:
-            messagebox.showerror("Erro de login", "Usuário já existe.")
+            messagebox.showerror("Erro de Login", "Escreva o nome de usuário")
 class RegisterScreen:
     def __init__(self, root):
 
@@ -77,18 +82,24 @@ class RegisterScreen:
         user = self.entry_username.get()
         password = self.entry_password.get()
         password2 = self.entry_password2.get()
-        if password==password2:
-            resultado = self.controller.setUser(user, password)
-            if resultado:
-                messagebox.showinfo("Login bem-sucedido", "Bem-vindo ao Gerenciador de Tarefas!")
-                open_login(self.root)
+        if user:
+            if password and password2:
+                if password==password2:
+                    resultado = self.controller.setUser(user, password)
+                    if resultado:
+                        messagebox.showinfo("Login bem-sucedido", "Bem-vindo ao Gerenciador de Tarefas!")
+                        open_login(self.root)
 
+                    else:
+                        messagebox.showerror("Erro de Registro", "Usuário já existe.")
+                else:
+                    messagebox.showerror("Erro de Registro", "Senhas diferentes")
+                    self.entry_password.delete(0, END)
+                    self.entry_password2.delete(0, END)
             else:
-                messagebox.showerror("Erro de Registro", "Usuário já existe.")
+                messagebox.showerror("Erro de Registro", "Escreva as duas senhas")
         else:
-            messagebox.showerror("Erro de Registro", "Senhas diferentes")
-            self.entry_password.delete(0, END)
-            self.entry_password2.delete(0, END)
+            messagebox.showerror("Erro de Registro", "Coloque um nome")
 
 class TaskManager:
     def __init__(self, root):
